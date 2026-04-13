@@ -1,0 +1,1 @@
+<img src="{{ asset('logo.png') }}" alt="Smart Hospital Logo" class="h-8 w-auto">
