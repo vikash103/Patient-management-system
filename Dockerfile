@@ -17,10 +17,11 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # Laravel setup
-RUN php artisan config:cache
+RUN php artisan config:clear
+RUN php artisan cache:clear
 
 # Port expose
 EXPOSE 10000
 
-# Start server
-CMD php artisan serve --host=0.0.0.0 --port=10000
+# ✅ IMPORTANT FIX (serve public folder)
+CMD php -S 0.0.0.0:10000 -t public
