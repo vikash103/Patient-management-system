@@ -12,8 +12,17 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
-# ✅ Permissions fix
-RUN chmod -R 777 storage bootstrap/cache
+# ✅ SQLite setup add karo (IMPORTANT)
+RUN mkdir -p database \
+    && touch database/database.sqlite
+
+# ✅ Permissions
+RUN chmod -R 777 storage bootstrap/cache database
+
+# ✅ Cache clear + migrate
+RUN php artisan config:clear \
+    && php artisan cache:clear \
+    && php artisan migrate --force
 
 EXPOSE 10000
 
