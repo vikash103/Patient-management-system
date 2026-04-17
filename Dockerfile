@@ -1,8 +1,8 @@
 FROM php:8.2-cli
 
-# Install dependencies + PostgreSQL support
+# Install system dependencies + PostgreSQL
 RUN apt-get update && apt-get install -y \
-    git unzip curl libzip-dev zip libpq-dev \
+    git unzip curl libzip-dev zip libpq-dev nodejs npm \
     && docker-php-ext-install zip pdo pdo_pgsql
 
 # Install Composer
@@ -12,7 +12,11 @@ WORKDIR /app
 
 COPY . .
 
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Install Node dependencies & build assets
+RUN npm install && npm run build
 
 # Permissions
 RUN chmod -R 777 storage bootstrap/cache
