@@ -1,29 +1,25 @@
 FROM php:8.2-cli
 
-# Install dependencies + SQLite support
+# Install dependencies + PostgreSQL support
 RUN apt-get update && apt-get install -y \
-    git unzip curl libzip-dev zip sqlite3 \
-    && docker-php-ext-install zip pdo pdo_sqlite
+    git unzip curl libzip-dev zip libpq-dev \
+    && docker-php-ext-install zip pdo pdo_pgsql
 
-# Install composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Copy files
 COPY . .
 
-# Install Laravel dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Create SQLite DB
-RUN mkdir -p database && touch database/database.sqlite
-
 # Permissions
-RUN chmod -R 777 storage bootstrap/cache database
+RUN chmod -R 777 storage bootstrap/cache
 
 EXPOSE 10000
 
 CMD php artisan config:clear && \
+    php artisan cache:clear && \
     php artisan migrate --force && \
     php -S 0.0.0.0:10000 -t public
